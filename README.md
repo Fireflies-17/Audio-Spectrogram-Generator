@@ -1,0 +1,1 @@
+Obtaining the Time(t)-Frequency(f)-Magnitude(colors) Spectrogram of an Audio Signal using the Short-Time Fourier Transform(STFT) and Fast Fourier Transform(FFT), based on the Python language's Matplotlib library.
