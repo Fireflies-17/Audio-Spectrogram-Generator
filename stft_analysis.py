@@ -44,6 +44,7 @@ def plot_spectrogram(stft_result, sample_rate, hop_length, max_len, title="频�
         stft_result (np.ndarray): STFT结果
         sample_rate (int): 采样率
         hop_length (int): 帧移大小
+        max_len (int): 最大显示频率
         title (str): 图表标题
         save_path (str): 保存路径，如果为None则不保存
         cmap (str): 颜色映射方案，默认'jet'（蓝紫->红）
@@ -92,6 +93,7 @@ def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max
         n_fft (int): FFT窗口大小
         hop_length (int): 帧移大小
         n_mels (int): Mel滤波器数量
+        max_len (int): 最大显示频率
         title (str): 图表标题
         save_path (str): 保存路径
     """
