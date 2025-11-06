@@ -35,7 +35,7 @@ def perform_stft(audio_data, sample_rate, n_fft=8192, hop_length=128):
     return stft_result, frequencies, times
 
 
-def plot_spectrogram(stft_result, sample_rate, hop_length=128, title="STFT频谱图", save_path=None, cmap='jet'):
+def plot_spectrogram(stft_result, sample_rate, hop_length=128, title="频谱图", save_path=None, cmap='jet'):
     """
     绘制频谱图
     
@@ -62,15 +62,21 @@ def plot_spectrogram(stft_result, sample_rate, hop_length=128, title="STFT频谱
         cmap=cmap  # 使用jet配色：蓝紫色(低)到红色(高)
     )
 
-    plt.colorbar(img, format='%+2.0f dB', label='dB')
-    plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Frequency', fontsize=12)
-    plt.title(title, fontsize=14)
+    # 调整colorbar(图例栏)
+    cbar = plt.colorbar(img, format='%+2.0f dB')
+    cbar.ax.tick_params(labelsize=24)  # colorbar刻度数字大小
+
+    plt.xlabel('Time(s)', fontsize=36, labelpad=16)
+    plt.ylabel('Frequency(Hz)', fontsize=36, labelpad=16)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+
+    plt.title(title, fontsize=48, pad=20)
     plt.ylim(0, 5000)  # 限制显示频率范围为 0-5000Hz
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300)
 
     plt.show()
 
@@ -112,15 +118,21 @@ def plot_mel_spectrogram(audio_data, sample_rate, n_fft=8192, hop_length=128, n_
         cmap='jet'  # 使用jet配色：蓝紫色(低)到红色(高)
     )
 
-    plt.colorbar(img, format='%+2.0f dB', label='dB')
-    plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Frequency', fontsize=12)
-    plt.title(title, fontsize=14)
+    # 调整colorbar(图例栏)
+    cbar = plt.colorbar(img, format='%+2.0f dB')
+    cbar.ax.tick_params(labelsize=24)  # colorbar刻度数字大小
+
+    plt.xlabel('Time(s)', fontsize=36, labelpad=16)
+    plt.ylabel('Frequency(Hz)', fontsize=36, labelpad=16)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+
+    plt.title(title, fontsize=48, pad=20)
     plt.ylim(0, 5000)  # 限制显示频率范围为 0-5000Hz
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300)
     
     plt.show()
 
