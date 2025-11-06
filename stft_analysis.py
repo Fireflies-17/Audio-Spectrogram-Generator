@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from matplotlib import font_manager
+from pitch_analysis import analyze_fundamental_frequency
 
 
 # 设置中文字体
@@ -10,7 +11,7 @@ plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'Arial Unicode M
 plt.rcParams['axes.unicode_minus'] = False
 
 
-def perform_stft(audio_data, sample_rate, n_fft=8192, hop_length=128):
+def perform_stft(audio_data, sample_rate, n_fft, hop_length):
     """
     对音频数据执行STFT变换
     
@@ -35,7 +36,7 @@ def perform_stft(audio_data, sample_rate, n_fft=8192, hop_length=128):
     return stft_result, frequencies, times
 
 
-def plot_spectrogram(stft_result, sample_rate, hop_length=128, title="频谱图", save_path=None, cmap='jet'):
+def plot_spectrogram(stft_result, sample_rate, hop_length, max_len, title="频谱图", save_path=None, cmap='jet'):
     """
     绘制频谱图
     
@@ -72,7 +73,7 @@ def plot_spectrogram(stft_result, sample_rate, hop_length=128, title="频谱图"
     plt.yticks(fontsize=24)
 
     plt.title(title, fontsize=48, pad=20)
-    plt.ylim(0, 5000)  # 限制显示频率范围为 0-5000Hz
+    plt.ylim(0, max_len)  # 限制显示频率范围为 0-5000Hz
     plt.tight_layout()
 
     if save_path:
@@ -81,7 +82,7 @@ def plot_spectrogram(stft_result, sample_rate, hop_length=128, title="频谱图"
     plt.show()
 
 
-def plot_mel_spectrogram(audio_data, sample_rate, n_fft=8192, hop_length=128, n_mels=1024, title="Mel频谱图", save_path=None):
+def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, title="Mel频谱图", save_path=None):
     """
     绘制Mel频谱图（更符合人耳感知，热力图形式）
 
@@ -128,7 +129,7 @@ def plot_mel_spectrogram(audio_data, sample_rate, n_fft=8192, hop_length=128, n_
     plt.yticks(fontsize=24)
 
     plt.title(title, fontsize=48, pad=20)
-    plt.ylim(0, 5000)  # 限制显示频率范围为 0-5000Hz
+    plt.ylim(0, max_len)  # 限制显示频率范围为 0-5000Hz
     plt.tight_layout()
 
     if save_path:
@@ -137,7 +138,7 @@ def plot_mel_spectrogram(audio_data, sample_rate, n_fft=8192, hop_length=128, n_
     plt.show()
 
 
-def analyze_audio_with_stft(audio_data, sample_rate, n_fft=8192, hop_length=128, save_path=None):
+def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, save_path=None):
     """
     对音频进行完整的STFT分析并可视化
     
@@ -150,14 +151,17 @@ def analyze_audio_with_stft(audio_data, sample_rate, n_fft=8192, hop_length=128,
     """
     print("Starting analysis...")
     
+    # 分析基频范围
+    pitch_result = analyze_fundamental_frequency(audio_data, sample_rate)
+    
     # 执行STFT
     stft_result, frequencies, times = perform_stft(audio_data, sample_rate, n_fft, hop_length)
     
     # 绘制标准频谱图
-    plot_spectrogram(stft_result, sample_rate, hop_length, save_path=save_path)
+    plot_spectrogram(stft_result, sample_rate, hop_length, max_len, save_path=save_path)
     
     # 绘制Mel频谱图
     mel_save_path = save_path.replace('.png', '_mel.png') if save_path else None
-    plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, save_path=mel_save_path)
+    plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, save_path=mel_save_path)
 
     print("Done.")
