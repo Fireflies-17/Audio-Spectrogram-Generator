@@ -1,10 +1,9 @@
-import sys
 import os
 from datetime import datetime
-from audio_file_input import load_audio_from_file
-from audio_mic_input import record_audio_from_mic, save_recorded_audio
-from data_txt_input import load_data_from_txt
-from stft_analysis import analyze_audio_with_stft
+from input_func.audio_file_input import load_audio_from_file
+from input_func.audio_mic_input import record_audio_from_mic, save_recorded_audio
+from input_func.data_txt_input import load_data_from_txt
+from analysis_func.stft_analysis import analyze_audio_with_stft
 
 
 def generate_output_path(prefix="spectrogram", extension="png"):
@@ -20,11 +19,11 @@ def generate_output_path(prefix="spectrogram", extension="png"):
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{prefix}_{timestamp}.{extension}"
-    return os.path.join("output", filename)
+    return os.path.join("data/output", filename)
 
 
 def process_file_with_stft(sample_rate, n_fft, hop_length, n_mels, max_len):
-    file_path = input("Path: ").strip('"').strip("'")
+    file_path = 'data/input/test_audio.wav'  #input("Path: ").strip('"').strip("'")
     audio_data, sample_rate = load_audio_from_file(file_path, sr=sample_rate)
     
     if audio_data is not None:
@@ -53,7 +52,7 @@ def process_mic_with_stft(sample_rate, n_fft, hop_length, n_mels, max_len):
 
 
 def process_txt_data_with_stft(sample_rate, n_fft, hop_length, n_mels, max_len):
-    file_path = 'data.txt' #input("TXT file path: ").strip('"').strip("'")
+    file_path = 'data/input/out_data_enhanced.txt'  #input("TXT file path: ").strip('"').strip("'")
 
     audio_data, sample_rate = load_data_from_txt(file_path, sample_rate=sample_rate)
     

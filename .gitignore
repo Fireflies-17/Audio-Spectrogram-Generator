@@ -40,11 +40,11 @@ venv.bak/
 *.flac
 *.ogg
 *.m4a
-test_audio.wav
+data/input/test_audio.wav
 recorded_audio.wav
 
 # 输出文件夹
-output/
+data/output/
 
 # 输出图像
 *.png
@@ -64,3 +64,6 @@ desktop.ini
 
 # 日志
 *.log
+/data/input/data.txt
+/data/input/out_data_enhanced.txt
+/data/input/out_data.txt
