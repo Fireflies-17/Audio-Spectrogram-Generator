@@ -42,11 +42,11 @@ venv.bak/
 *.m4a
 *.zip
 *.csv
-dat/input_dat/test_audio.wav
+data/input_data/test_audio.wav
 recorded_audio.wav
 
 # 输出文件夹
-dat/output_dat/
+data/output_data/
 
 # 输出图像
 *.png
@@ -66,6 +66,6 @@ desktop.ini
 
 # 日志
 *.log
-/dat/input_dat/data.txt
-/dat/input_dat/out_data_enhanced.txt
-/dat/input_dat/out_data.txt
+/data/input_data/data.txt
+/data/input_data/out_data_enhanced.txt
+/data/input_data/out_data.txt
