@@ -8,13 +8,13 @@
 
 ## Input:
 
-Choose between two input methods in `main.py` via the `main()` function:
-- Import audio files from a path
-- Record audio from microphone
+- Import a txt file or csv file containing audio signal data
 
 
 ## Output:  
 
-Generates two types of visualizations:
-- Standard Spectrogram
-- Mel Spectrogram
+- Generates two types of visualizations:
+  - Standard Spectrogram
+  - Mel Spectrogram
+
+- Pitch Analysis

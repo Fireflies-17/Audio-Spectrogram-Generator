@@ -13,9 +13,6 @@ def analyze_fundamental_frequency(audio_data, sample_rate, fmin=50, fmax=2000, f
         fmax (float): 最大检测频率（Hz），默认2000Hz
         frame_length (int): 帧长度，默认2048
         hop_length (int): 帧移，默认512
-        
-    返回:
-        dict: 包含基频分析结果的字典
     """
     print("\n" + "="*60)
     print("Fundamental Frequency Analysis")
@@ -73,23 +70,6 @@ def analyze_fundamental_frequency(audio_data, sample_rate, fmin=50, fmax=2000, f
         print(f"  Mean F0:       {f0_mean:>10.2f} Hz")
         print(f"  Range:         {f0_min:.2f} - {f0_max:.2f} Hz")
         print("="*60 + "\n")
-        
-        # 返回结果字典
-        result = {
-            'f0_values': f0,
-            'valid_f0': valid_f0,
-            'f0_min': f0_min,
-            'f0_max': f0_max,
-            'f0_mean': f0_mean,
-            'f0_median': f0_median,
-            'f0_std': f0_std,
-            'voiced_percentage': voiced_percentage,
-            'sample_rate': sample_rate,
-            'voiced_flag': voiced_flag,
-            'voiced_probs': voiced_probs
-        }
-        
-        return result
         
     except Exception as e:
         print(f"Error during pitch analysis: {e}")

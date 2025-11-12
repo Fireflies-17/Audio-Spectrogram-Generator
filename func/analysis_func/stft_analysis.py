@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
-from matplotlib import font_manager
-from pitch_analysis import analyze_fundamental_frequency
+from tqdm import tqdm
+from func.analysis_func.pitch_analysis import analyze_fundamental_frequency
 
 
 # 设置中文字体
@@ -26,8 +26,41 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length):
         frequencies (np.ndarray): 频率数组
         times (np.ndarray): 时间数组
     """
-    # 执行STFT
-    stft_result = librosa.stft(audio_data, n_fft=n_fft, hop_length=hop_length)
+    # 执行STFT，显示进度条
+    print("执行STFT变换...")
+    
+    # 计算总帧数
+    n_frames = 1 + (len(audio_data) - n_fft) // hop_length
+    
+    # 手动实现STFT以显示真实进度
+    # 初始化结果数组
+    stft_result = np.zeros((n_fft // 2 + 1, n_frames), dtype=np.complex128)
+    
+    # 创建汉宁窗
+    window = np.hanning(n_fft)
+    
+    # 使用进度条遍历每一帧
+    with tqdm(total=n_frames, desc="STFT进度", unit="帧", ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+        for frame_idx in range(n_frames):
+            # 计算当前帧的起始位置
+            start = frame_idx * hop_length
+            end = start + n_fft
+            
+            # 提取当前帧的音频数据
+            if end <= len(audio_data):
+                frame = audio_data[start:end] * window
+            else:
+                # 处理边界情况，用零填充
+                frame = np.zeros(n_fft)
+                available = len(audio_data) - start
+                if available > 0:
+                    frame[:available] = audio_data[start:] * window[:available]
+            
+            # 执行FFT
+            stft_result[:, frame_idx] = np.fft.rfft(frame)
+            
+            # 更新进度条
+            pbar.update(1)
     
     # 计算频率和时间轴
     frequencies = librosa.fft_frequencies(sr=sample_rate, n_fft=n_fft)
@@ -36,7 +69,7 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length):
     return stft_result, frequencies, times
 
 
-def plot_spectrogram(stft_result, sample_rate, hop_length, max_len, title="频谱图", save_path=None, cmap='jet'):
+def plot_spectrogram(stft_result, sample_rate, hop_length, max_len, save_path=None, cmap='jet'):
     """
     绘制频谱图
     
@@ -73,7 +106,7 @@ def plot_spectrogram(stft_result, sample_rate, hop_length, max_len, title="频�
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
 
-    plt.title(title, fontsize=48, pad=20)
+    plt.title(f"频谱图-SampleRate{sample_rate}-HopLength{hop_length}", fontsize=40, pad=20)
     plt.ylim(0, max_len)  # 限制显示频率范围为 0-5000Hz
     plt.tight_layout()
 
@@ -83,7 +116,7 @@ def plot_spectrogram(stft_result, sample_rate, hop_length, max_len, title="频�
     plt.show()
 
 
-def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, title="Mel频谱图", save_path=None):
+def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, save_path=None):
     """
     绘制Mel频谱图（更符合人耳感知，热力图形式）
 
@@ -99,14 +132,42 @@ def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max
     """
     plt.figure(figsize=(20, 16), dpi=300)
 
-    # 计算Mel频谱图
-    mel_spectrogram = librosa.feature.melspectrogram(
-        y=audio_data,
-        sr=sample_rate,
-        n_fft=n_fft,
-        hop_length=hop_length,
-        n_mels=n_mels
-    )
+    # 计算总帧数
+    n_frames = 1 + (len(audio_data) - n_fft) // hop_length
+    
+    # 手动计算STFT用于Mel频谱图
+    stft_matrix = np.zeros((n_fft // 2 + 1, n_frames), dtype=np.complex128)
+    window = np.hanning(n_fft)
+    
+    # 第一步：计算STFT
+    with tqdm(total=n_frames, desc="Mel STFT计算", unit="帧", ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+        for frame_idx in range(n_frames):
+            start = frame_idx * hop_length
+            end = start + n_fft
+            
+            if end <= len(audio_data):
+                frame = audio_data[start:end] * window
+            else:
+                frame = np.zeros(n_fft)
+                available = len(audio_data) - start
+                if available > 0:
+                    frame[:available] = audio_data[start:] * window[:available]
+            
+            stft_matrix[:, frame_idx] = np.fft.rfft(frame)
+            pbar.update(1)
+    
+    # 计算功率谱
+    power_spec = np.abs(stft_matrix) ** 2
+    
+    # 第二步：应用Mel滤波器组
+    mel_basis = librosa.filters.mel(sr=sample_rate, n_fft=n_fft, n_mels=n_mels)
+    
+    # 逐帧应用Mel滤波器
+    mel_spectrogram = np.zeros((n_mels, n_frames))
+    with tqdm(total=n_frames, desc="Mel滤波器应用", unit="帧", ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+        for frame_idx in range(n_frames):
+            mel_spectrogram[:, frame_idx] = np.dot(mel_basis, power_spec[:, frame_idx])
+            pbar.update(1)
 
     # 转换为dB刻度
     mel_spectrogram_db = librosa.power_to_db(mel_spectrogram, ref=np.max)
@@ -130,7 +191,7 @@ def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
 
-    plt.title(title, fontsize=48, pad=20)
+    plt.title(f"Mel频谱图-SampleRate{sample_rate}-Nfft{n_fft}-HopLength{hop_length}-Nmels{n_mels}", fontsize=40, pad=20)
     plt.ylim(0, max_len)  # 限制显示频率范围为 0-5000Hz
     plt.tight_layout()
 
@@ -151,19 +212,31 @@ def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, n_mels, 
         hop_length (int): 帧移大小
         save_path (str): 图像保存路径
     """
-    print("Starting analysis...")
+    
+    print("\n=== 开始音频分析 ===")
+    print(f"音频长度: {len(audio_data)} 采样点")
+    print(f"采样率: {sample_rate} Hz")
+    print(f"预计处理时长: {len(audio_data)/sample_rate:.2f} 秒\n")
     
     # 分析基频范围
-    pitch_result = analyze_fundamental_frequency(audio_data, sample_rate)
+    # print("Starting analysis...")
+    # analyze_fundamental_frequency(audio_data, sample_rate)
     
     # 执行STFT
     stft_result, frequencies, times = perform_stft(audio_data, sample_rate, n_fft, hop_length)
     
     # 绘制标准频谱图
-    plot_spectrogram(stft_result, sample_rate, hop_length, max_len, save_path=save_path)
+    print("\n绘制标准频谱图...")
+    with tqdm(total=100, desc="频谱图生成", unit="%", ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+        plot_spectrogram(stft_result, sample_rate, hop_length, max_len, save_path=save_path)
+        pbar.update(100)
     
     # 绘制Mel频谱图
+    print("\n计算Mel频谱图...")
     mel_save_path = save_path.replace('.png', '_mel.png') if save_path else None
     plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, save_path=mel_save_path)
 
-    print("Done.")
+    print("\n✓ 分析完成！")
+    if save_path:
+        print(f"✓ 文件已保存至: {save_path}")
+        print(f"✓ Mel频谱图已保存至: {mel_save_path}")
