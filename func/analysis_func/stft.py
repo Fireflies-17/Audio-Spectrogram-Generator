@@ -10,7 +10,7 @@ plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'Arial Unicode M
 plt.rcParams['axes.unicode_minus'] = False
 
 
-def perform_stft(audio_data, sample_rate, n_fft, hop_length):
+def perform_stft(audio_data, sample_rate, n_fft, hop_length, win_length, window='hann'):
     """
     对音频数据执行STFT变换
     
@@ -19,6 +19,8 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length):
         sample_rate (int): 采样率
         n_fft (int): FFT窗口大小
         hop_length (int): 帧移大小
+        win_length (int): 窗口长度
+        window (str): 窗口函数类型，默认'hann'
         
     返回:
         stft_result (np.ndarray): STFT复数结果
@@ -26,7 +28,7 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length):
         times (np.ndarray): 时间数组
     """
     # 使用librosa原生STFT函数
-    stft_result = librosa.stft(audio_data, n_fft=n_fft, hop_length=hop_length)
+    stft_result = librosa.stft(audio_data, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window)
     
     # 计算频率和时间轴
     frequencies = librosa.fft_frequencies(sr=sample_rate, n_fft=n_fft)
@@ -35,8 +37,8 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length):
     return stft_result, frequencies, times
 
 
-def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len,
-                            save_path=None):
+def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, win_length, n_mels, max_len,
+                            window='hann', save_path=None, vmin=-80):
     """
     对音频进行完整的STFT分析并可视化
     
@@ -45,26 +47,29 @@ def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, n_mels, 
         sample_rate (int): 采样率
         n_fft (int): FFT窗口大小
         hop_length (int): 帧移大小
+        win_length (int): 窗口长度
         n_mels (int): Mel频带数量
         max_len (int): 最大显示频率
+        window (str): 窗口函数类型，默认'hann'
         save_path (str): 图像保存路径
+        vmin (float): 颜色映射的最小值（dB），默认-80
         is_demodulated (bool): 是否为解调信号
         title_suffix (str): 标题后缀
     """
     
     # 执行STFT
     print("\nPerforming STFT transformation...")
-    stft_result, frequencies, times = perform_stft(audio_data, sample_rate, n_fft, hop_length)
+    stft_result, frequencies, times = perform_stft(audio_data, sample_rate, n_fft, hop_length, win_length, window)
     
     # 绘制标准频谱图
     print("\nPlotting standard spectrogram...")
-    plot_spectrogram(stft_result, sample_rate, hop_length, n_fft, max_len,
-                     save_path=save_path)
+    plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft, max_len,
+                     save_path=save_path, vmin=vmin)
     print("Standard spectrogram plotted.")
     
     # 绘制Mel频谱图
     #print("\nComputing Mel spectrogram...")
     #mel_save_path = save_path.replace('.png', '_mel.png') if save_path else None
-    #plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, n_mels, max_len, save_path=mel_save_path)
+    #plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, win_length, window, n_mels, max_len, save_path=mel_save_path, vmin=vmin)
 
     print("\nDone. Spectrograms generated successfully.")

@@ -63,3 +63,43 @@ def load_data_from_csv(file_path, sample_rate=None, channel='CH2V'):
     except Exception as e:
         print(f"Error loading CSV file: {e}")
         return None, None
+
+
+def load_data_from_csv_simple(file_path, sample_rate):
+    """
+    从简单格式的CSV文件加载单通道采样数据（无表头，单列数据）
+    
+    参数:
+        file_path (str): CSV文件路径
+        sample_rate (int): 采样率，单位Hz（例如：5e6表示5MSa/s）
+        
+    返回:
+        audio_data (np.ndarray): 音频时域信号
+        sample_rate (int): 采样率
+    """
+    try:
+        # 读取单列数据，无表头
+        df = pd.read_csv(
+            file_path,
+            header=None
+        )
+        
+        # 转换为numpy数组（取第一列）
+        data = df.iloc[:, 0].values
+        
+        # 移除NaN值
+        data = data[~np.isnan(data)]
+        
+        n_points = len(data)
+        duration = n_points / sample_rate
+        
+        print(f"Loading: {file_path}")
+        print(f"  Sample rate: {sample_rate / 1e6:.2f} MSa/s")
+        print(f"  Duration: {duration:.2f} seconds, {n_points} samples")
+        print(f"  Format: Simple (no header, single column)")
+        
+        return data, sample_rate
+
+    except Exception as e:
+        print(f"Error loading simple CSV file: {e}")
+        return None, None
