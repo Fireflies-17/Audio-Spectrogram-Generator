@@ -4,6 +4,7 @@ import librosa
 import librosa.display
 from matplotlib import font_manager
 from func.plot_func.spectrogram import plot_spectrogram, plot_mel_spectrogram
+from func.analysis_func.filter import lowpass_filter
 
 
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'Arial Unicode MS']
@@ -38,7 +39,7 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length, win_length, window=
 
 
 def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, win_length, n_mels, max_len,
-                            window='hann', save_path=None, vmin=-80):
+                            window='hann', save_path=None, vmin=-80, filter_cutoff_freq=None, filter_order=5):
     """
     对音频进行完整的STFT分析并可视化
     
@@ -53,9 +54,14 @@ def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, win_leng
         window (str): 窗口函数类型，默认'hann'
         save_path (str): 图像保存路径
         vmin (float): 颜色映射的最小值（dB），默认-80
-        is_demodulated (bool): 是否为解调信号
-        title_suffix (str): 标题后缀
+        filter_cutoff_freq (float): 低通滤波器截止频率 (Hz)，默认None表示不使用滤波
+        filter_order (int): 低通滤波器阶数，默认5
     """
+    
+    # 在STFT之前应用低通滤波
+    if filter_cutoff_freq is not None:
+        print(f"\nApplying lowpass filter before STFT (cutoff: {filter_cutoff_freq} Hz)...")
+        audio_data = lowpass_filter(audio_data, sample_rate, filter_cutoff_freq, order=filter_order)
     
     # 执行STFT
     print("\nPerforming STFT transformation...")
