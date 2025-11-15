@@ -11,7 +11,7 @@ plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'Arial Unicode M
 plt.rcParams['axes.unicode_minus'] = False
 
 
-def perform_stft(audio_data, sample_rate, n_fft, hop_length, win_length, window='hann'):
+def perform_stft_librosa(audio_data, sample_rate, n_fft, hop_length, win_length, window='hann'):
     """
     对音频数据执行STFT变换
     
@@ -38,8 +38,9 @@ def perform_stft(audio_data, sample_rate, n_fft, hop_length, win_length, window=
     return stft_result, frequencies, times
 
 
-def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, win_length, n_mels, max_len,
-                            window='hann', save_path=None, vmin=-80, filter_cutoff_freq=None, filter_order=5):
+def analyze_audio_with_stft_librosa(audio_data, sample_rate, n_fft, hop_length, win_length, n_mels,
+                                    max_len, window='hann', save_path=None, vmin=-80,
+                                    filter_cutoff_freq=None, filter_order=5):
     """
     对音频进行完整的STFT分析并可视化
     
@@ -65,7 +66,7 @@ def analyze_audio_with_stft(audio_data, sample_rate, n_fft, hop_length, win_leng
     
     # 执行STFT
     print("\nPerforming STFT transformation...")
-    stft_result, frequencies, times = perform_stft(audio_data, sample_rate, n_fft, hop_length, win_length, window)
+    stft_result, frequencies, times = perform_stft_librosa(audio_data, sample_rate, n_fft, hop_length, win_length, window)
     
     # 绘制标准频谱图
     print("\nPlotting standard spectrogram...")

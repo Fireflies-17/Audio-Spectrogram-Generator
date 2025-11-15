@@ -4,8 +4,8 @@ import librosa
 import librosa.display
 
 
-def plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft, max_len, save_path=None,
-                     cmap='jet', vmin=-80):
+def plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft,
+                     max_len, save_path=None, cmap='jet', vmin=-80):
     """
     绘制频谱图
 
@@ -65,8 +65,8 @@ def plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n
     plt.show()
 
 
-def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, win_length, window, n_mels, max_len,
-                         save_path=None, vmin=-80):
+def plot_mel_spectrogram(audio_data, sample_rate, n_fft, hop_length, win_length, window, n_mels,
+                         max_len, save_path=None, vmin=-80):
     """
     绘制Mel频谱图（更符合人耳感知，热力图形式）
 
