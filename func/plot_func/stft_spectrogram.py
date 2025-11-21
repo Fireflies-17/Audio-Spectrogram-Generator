@@ -4,8 +4,8 @@ import librosa
 import librosa.display
 
 
-def plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft,
-                     max_len, save_path=None, cmap='jet', vmin=-80):
+def stft_plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft,
+                          max_len, save_path=None, cmap='jet', vmin=-80):
     """
     绘制频谱图
 

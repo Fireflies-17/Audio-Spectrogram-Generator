@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from matplotlib import font_manager
-from func.plot_func.spectrogram import plot_spectrogram, plot_mel_spectrogram
+from func.plot_func.stft_spectrogram import stft_plot_spectrogram, plot_mel_spectrogram
 from func.analysis_func.filter import lowpass_filter
 
 
@@ -70,8 +70,8 @@ def analyze_audio_with_stft_librosa(audio_data, sample_rate, n_fft, hop_length, 
     
     # 绘制标准频谱图
     print("\nPlotting standard spectrogram...")
-    plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft, max_len,
-                     save_path=save_path, vmin=vmin)
+    stft_plot_spectrogram(stft_result, sample_rate, hop_length, win_length, window, n_fft, max_len,
+                          save_path=save_path, vmin=vmin)
     print("Standard spectrogram plotted.")
     
     # 绘制Mel频谱图
